@@ -15,7 +15,8 @@
 <body>
     <div class="app-container">
         <!-- Sidebar for Progress & Info -->
-        <aside class="sidebar">
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo-icon">
                     <i class="fa-solid fa-microchip"></i>
@@ -68,9 +69,14 @@
         <!-- Main Chat Area -->
         <main class="chat-main">
             <header class="chat-header">
-                <div class="header-info">
-                    <h1>Interdisciplinary Analysis</h1>
-                    <p>Structured 5-Phase Engineering Evaluation</p>
+                <div class="header-left">
+                    <button id="mobile-menu-btn" class="icon-btn mobile-only" title="Menu">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="header-info">
+                        <h1>Interdisciplinary Analysis</h1>
+                        <p>Structured 5-Phase Engineering Evaluation</p>
+                    </div>
                 </div>
                 <button id="reset-btn" class="icon-btn" title="Reset Session">
                     <i class="fa-solid fa-rotate-right"></i>

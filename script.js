@@ -9,7 +9,10 @@ const elements = {
     sendBtn: document.getElementById('send-btn'),
     resetBtn: document.getElementById('reset-btn'),
     typingIndicator: document.getElementById('typing-indicator'),
-    navItems: document.querySelectorAll('.phase-item')
+    navItems: document.querySelectorAll('.phase-item'),
+    sidebar: document.getElementById('sidebar'),
+    sidebarOverlay: document.getElementById('sidebar-overlay'),
+    mobileMenuBtn: document.getElementById('mobile-menu-btn')
 };
 
 // State Machine Definitions
@@ -356,4 +359,28 @@ elements.resetBtn.addEventListener('click', () => {
     if(confirm('Are you sure you want to reset the session?')) {
         location.reload();
     }
+});
+
+if (elements.mobileMenuBtn) {
+    elements.mobileMenuBtn.addEventListener('click', () => {
+        elements.sidebar.classList.add('open');
+        elements.sidebarOverlay.classList.add('open');
+    });
+}
+
+if (elements.sidebarOverlay) {
+    elements.sidebarOverlay.addEventListener('click', () => {
+        elements.sidebar.classList.remove('open');
+        elements.sidebarOverlay.classList.remove('open');
+    });
+}
+
+// Close sidebar when clicking a nav item on mobile
+elements.navItems.forEach(item => {
+    item.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+            elements.sidebar.classList.remove('open');
+            elements.sidebarOverlay.classList.remove('open');
+        }
+    });
 });
