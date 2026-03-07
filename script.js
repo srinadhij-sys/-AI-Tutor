@@ -6,6 +6,7 @@
 const elements = {
     chatMessages: document.getElementById('chat-messages'),
     userInput: document.getElementById('user-input'),
+    hintBtn: document.getElementById('hint-btn'),
     sendBtn: document.getElementById('send-btn'),
     resetBtn: document.getElementById('reset-btn'),
     typingIndicator: document.getElementById('typing-indicator'),
@@ -113,6 +114,14 @@ let consecutiveFails = 0; // Tracks consecutive non-correct answers
 const evaluateAnswer = (input) => {
     const lower = input.toLowerCase().trim();
     
+    // 0. Is it a hint request?
+    if (lower === 'hint' || lower.includes('need a hint') || lower.includes('give me a hint') || lower.includes('can i get a hint')) {
+        return { 
+            type: 'hint', 
+            hint: "Here's a hint to guide you: consider the underlying concepts related to software logic, mechanical structure, and their integration. Try answering again." 
+        };
+    }
+
     // 1. Is it a question?
     if (lower.endsWith('?') || lower.startsWith('what') || lower.startsWith('how') || lower.startsWith('why')) {
         return { type: 'question', hint: "That's a great question. In the context of our analysis, the focus is on breaking down the system into core components. Let's return to the prompt:" };
@@ -299,7 +308,11 @@ const handlePhaseLogic = (input, maxQuestions, nextState, nextNavIdx, followUpQu
     
     let feedback = null;
 
-    if (evalResult.type === 'question') {
+    if (evalResult.type === 'hint') {
+        feedback = { status: 'partial', hint: evalResult.hint };
+        appendMessage(feedback.hint, false, feedback);
+        return; // Early return to force them to try again without advancing the phase interaction count
+    } else if (evalResult.type === 'question') {
         feedback = { status: 'partial', hint: evalResult.hint };
     } else if (evalResult.type === 'dont_know') {
         feedback = { status: 'wrong', hint: evalResult.hint };
@@ -344,6 +357,12 @@ elements.userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         processUserInput(elements.userInput.value);
+    }
+});
+
+elements.hintBtn.addEventListener('click', () => {
+    if (currentState >= STATE.PHASE1_ANALYZE && currentState <= STATE.PHASE5_HARMONIZE) {
+        processUserInput("I need a hint.");
     }
 });
 
