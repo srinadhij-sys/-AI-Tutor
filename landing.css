@@ -423,7 +423,7 @@ footer {
     .hero {
         flex-direction: column;
         text-align: center;
-        gap: 4rem;
+        gap: 3rem;
         margin-top: 3rem;
     }
     .hero-content {
@@ -445,7 +445,80 @@ footer {
 }
 
 @media (max-width: 600px) {
-    .hero h1 { font-size: 2.5rem; }
+    .navbar {
+        padding: 1rem 5%;
+    }
+    .logo h2 {
+        font-size: 1.2rem;
+    }
+    .logo-icon {
+        width: 32px; height: 32px; font-size: 1rem;
+    }
+    
+    /* Greatly reduce hero size and gaps */
+    .hero {
+        margin: 2rem auto 1rem;
+        gap: 2rem;
+        min-height: auto;
+    }
+    .hero h1 { 
+        font-size: 2rem; 
+        margin-bottom: 0.8rem;
+    }
+    .hero p {
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Make the visual card responsive so it doesn't take 100% height */
+    .mockup-card {
+        max-width: 90%;
+        margin: 0 auto;
+    }
+    .mockup-body {
+        padding: 1rem;
+        gap: 0.8rem;
+    }
+    .msg-bubble {
+        font-size: 0.8rem;
+        padding: 0.6rem 0.8rem;
+    }
+
     .nav-links a:not(.nav-btn) { display: none; }
-    .features-section h2 { font-size: 2.2rem; }
+    .nav-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Fix features spacing */
+    .features-section {
+        margin: 2rem auto 3rem;
+    }
+    .features-section h2 { 
+        font-size: 1.8rem; 
+        margin-bottom: 2rem; 
+    }
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.2rem;
+    }
+    .feature-card {
+        padding: 1.5rem;
+    }
+    
+    footer {
+        margin-top: 2rem;
+        padding: 2rem 1.5rem;
+    }
 }
+
+@media (max-width: 400px) {
+    .hero { margin-top: 1rem; gap: 1.5rem; }
+    .hero h1 { font-size: 1.7rem; }
+    .badge { font-size: 0.75rem; padding: 0.3rem 0.8rem; margin-bottom: 1rem; }
+    .btn { font-size: 0.9rem; padding: 0.8rem 1.2rem; }
+    .mockup-msg { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+    .mockup-msg.user { align-items: flex-end; }
+    .mockup-msg i { display: none; }
+}
+
