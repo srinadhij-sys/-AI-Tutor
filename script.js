@@ -9,6 +9,7 @@ const elements = {
     hintBtn: document.getElementById('hint-btn'),
     sendBtn: document.getElementById('send-btn'),
     resetBtn: document.getElementById('reset-btn'),
+    fullscreenBtn: document.getElementById('fullscreen-btn'),
     typingIndicator: document.getElementById('typing-indicator'),
     navItems: document.querySelectorAll('.phase-item'),
     sidebar: document.getElementById('sidebar'),
@@ -379,6 +380,31 @@ elements.resetBtn.addEventListener('click', () => {
         location.reload();
     }
 });
+
+if (elements.fullscreenBtn) {
+    elements.fullscreenBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch((err) => {
+                console.warn(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+        } else {
+            document.exitFullscreen();
+        }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+        const icon = elements.fullscreenBtn.querySelector('i');
+        if (document.fullscreenElement) {
+            icon.classList.remove('fa-expand');
+            icon.classList.add('fa-compress');
+            elements.fullscreenBtn.setAttribute('title', 'Exit Fullscreen');
+        } else {
+            icon.classList.remove('fa-compress');
+            icon.classList.add('fa-expand');
+            elements.fullscreenBtn.setAttribute('title', 'Toggle Fullscreen');
+        }
+    });
+}
 
 if (elements.mobileMenuBtn) {
     elements.mobileMenuBtn.addEventListener('click', () => {
