@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Engineering Tutor</title>
+    <!-- Google Fonts: Inter and Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar for Progress & Info -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-microchip"></i>
+                </div>
+                <h2>AI Tutor</h2>
+            </div>
+            
+            <div class="progress-section">
+                <h3>Learning Journey</h3>
+                <ul class="phase-list" id="phase-list">
+                    <li class="phase-item active" id="nav-intro">
+                        <div class="phase-indicator"></div>
+                        <span>Introduction</span>
+                    </li>
+                    <li class="phase-item" id="nav-phase1">
+                        <div class="phase-indicator"></div>
+                        <span>Phase 1</span>
+                    </li>
+                    <li class="phase-item" id="nav-phase2">
+                        <div class="phase-indicator"></div>
+                        <span>Phase 2</span>
+                    </li>
+                    <li class="phase-item" id="nav-phase3">
+                        <div class="phase-indicator"></div>
+                        <span>Phase 3</span>
+                    </li>
+                    <li class="phase-item" id="nav-phase4">
+                        <div class="phase-indicator"></div>
+                        <span>Phase 4</span>
+                    </li>
+                    <li class="phase-item" id="nav-phase5">
+                        <div class="phase-indicator"></div>
+                        <span>Phase 5</span>
+                    </li>
+                    <li class="phase-item" id="nav-conclusion">
+                        <div class="phase-indicator"></div>
+                        <span>Conclusion</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <div class="pulse-dot"></div>
+                    <span>System Online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-main">
+            <header class="chat-header">
+                <div class="header-info">
+                    <h1>Interdisciplinary Analysis</h1>
+                    <p>Structured 5-Phase Engineering Evaluation</p>
+                </div>
+                <button id="reset-btn" class="icon-btn" title="Reset Session">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </header>
+
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will be injected here via JS -->
+                <div class="message tutor-message">
+                    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="bubble">
+                        <p>Welcome to the AI Engineering Tutor platform.</p>
+                        <p>Please type <strong>"Hi"</strong> in the chat box to begin the interactive learning session.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="typing-indicator hidden" id="typing-indicator">
+                <span></span><span></span><span></span>
+            </div>
+
+            <div class="chat-input-area">
+                <div class="input-container">
+                    <textarea id="user-input" placeholder="Type your response here..." rows="1" autofocus></textarea>
+                    <button id="send-btn" class="send-btn">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="input-footer">
+                    <span><i class="fa-solid fa-circle-info"></i> Press Enter to send, Shift+Enter for new line</span>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
