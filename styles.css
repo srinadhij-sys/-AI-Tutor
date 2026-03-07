@@ -552,6 +552,12 @@ body {
     gap: 1rem;
 }
 
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
 .mobile-only {
     display: none;
 }
