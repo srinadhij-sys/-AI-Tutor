@@ -111,6 +111,39 @@ const appendMessage = (text, isUser = false, feedbackObj = null) => {
 
 let consecutiveFails = 0; // Tracks consecutive non-correct answers
 
+const getHintForCurrentQuestion = (state, questionIndex) => {
+    const hints = {
+        [STATE.PHASE1_ANALYZE]: [
+            "Think about the main branches of engineering (e.g., software, mechanical, electrical) and how they apply here.",
+            "Consider if the problem can be solved by just one type of engineer, or if it needs a team of different experts.",
+            "Imagine how moving parts, power sources, and computer brains work together in this system."
+        ],
+        [STATE.PHASE2_SYNTHESIZE]: [
+            "What actual physical parts (sensors, motors) and digital logic (code) are needed?",
+            "Which domain knowledge can be safely ignored without breaking the core functionality?",
+            "Why are these specific core components the absolute building blocks for this project?"
+        ],
+        [STATE.PHASE3_CONTEXTUALIZE]: [
+            "Where would this be used in the real world? E.g., a factory, a hospital, or outdoors?",
+            "Think about who the final users are and what their specific needs or limitations might be."
+        ],
+        [STATE.PHASE4_INTEGRATE]: [
+            "How do the different parts we identified talk to each other to perform a single function?",
+            "Consider the flow of data: what specific rules or connections bind the hardware and software?"
+        ],
+        [STATE.PHASE5_HARMONIZE]: [
+            "Does the solution try to maximize performance while keeping the costs and size reasonable?",
+            "Think about balancing user safety, materials cost, efficiency, and ethics."
+        ]
+    };
+
+    if (hints[state] && hints[state][questionIndex]) {
+        return `Here's a hint: ${hints[state][questionIndex]} Try answering again.`;
+    }
+    
+    return "Here's a hint to guide you: consider the underlying concepts related to software logic, mechanical structure, and their integration. Try answering again.";
+};
+
 // Core Logic & Evaluation Engine
 const evaluateAnswer = (input) => {
     const lower = input.toLowerCase().trim();
@@ -119,7 +152,7 @@ const evaluateAnswer = (input) => {
     if (lower === 'hint' || lower.includes('need a hint') || lower.includes('give me a hint') || lower.includes('can i get a hint')) {
         return { 
             type: 'hint', 
-            hint: "Here's a hint to guide you: consider the underlying concepts related to software logic, mechanical structure, and their integration. Try answering again." 
+            hint: getHintForCurrentQuestion(currentState, interactionCount)
         };
     }
 

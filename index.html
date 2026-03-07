@@ -3,123 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Engineering Tutor</title>
+    <title>AI Engineering Tutor | Home</title>
     <!-- Google Fonts: Inter and Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="landing.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar for Progress & Info -->
-        <div class="sidebar-overlay" id="sidebar-overlay"></div>
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-icon">
-                    <i class="fa-solid fa-microchip"></i>
-                </div>
-                <h2>AI Tutor</h2>
-            </div>
-            
-            <div class="progress-section">
-                <h3>Learning Journey</h3>
-                <ul class="phase-list" id="phase-list">
-                    <li class="phase-item active" id="nav-intro">
-                        <div class="phase-indicator"></div>
-                        <span>Introduction</span>
-                    </li>
-                    <li class="phase-item" id="nav-phase1">
-                        <div class="phase-indicator"></div>
-                        <span>Phase 1</span>
-                    </li>
-                    <li class="phase-item" id="nav-phase2">
-                        <div class="phase-indicator"></div>
-                        <span>Phase 2</span>
-                    </li>
-                    <li class="phase-item" id="nav-phase3">
-                        <div class="phase-indicator"></div>
-                        <span>Phase 3</span>
-                    </li>
-                    <li class="phase-item" id="nav-phase4">
-                        <div class="phase-indicator"></div>
-                        <span>Phase 4</span>
-                    </li>
-                    <li class="phase-item" id="nav-phase5">
-                        <div class="phase-indicator"></div>
-                        <span>Phase 5</span>
-                    </li>
-                    <li class="phase-item" id="nav-conclusion">
-                        <div class="phase-indicator"></div>
-                        <span>Conclusion</span>
-                    </li>
-                </ul>
-            </div>
+    <div class="background-grid"></div>
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
 
-            <div class="sidebar-footer">
-                <div class="status-indicator">
-                    <div class="pulse-dot"></div>
-                    <span>System Online</span>
+    <nav class="navbar">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fa-solid fa-microchip"></i>
+            </div>
+            <h2>AI Tutor</h2>
+        </div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="app.html" class="nav-btn">Launch App</a>
+        </div>
+    </nav>
+
+    <main>
+        <header class="hero">
+            <div class="hero-content">
+                <div class="badge">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>Version 2.0 Now Live</span>
+                </div>
+                <h1>Master Engineering with<br><span class="gradient-text">Intelligent Facilitation</span></h1>
+                <p>An interactive, 5-phase learning experience designed to deepen your understanding through guided inquiry and the ASCIH framework.</p>
+                <div class="hero-actions">
+                    <a href="app.html" class="btn btn-primary">
+                        Start Learning Session
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
                 </div>
             </div>
-        </aside>
-
-        <!-- Main Chat Area -->
-        <main class="chat-main">
-            <header class="chat-header">
-                <div class="header-left">
-                    <button id="mobile-menu-btn" class="icon-btn mobile-only" title="Menu">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-                    <div class="header-info">
-                        <h1>Interdisciplinary Analysis</h1>
-                        <p>Structured 5-Phase Engineering Evaluation</p>
+            <div class="hero-visual">
+                <div class="glass-card mockup-card">
+                    <div class="mockup-header">
+                        <div class="mockup-dots">
+                            <span></span><span></span><span></span>
+                        </div>
                     </div>
-                </div>
-                <div class="header-right">
-                    <button id="fullscreen-btn" class="icon-btn" title="Toggle Fullscreen">
-                        <i class="fa-solid fa-expand"></i>
-                    </button>
-                    <button id="reset-btn" class="icon-btn" title="Reset Session">
-                        <i class="fa-solid fa-rotate-right"></i>
-                    </button>
-                </div>
-            </header>
-
-            <div class="chat-messages" id="chat-messages">
-                <!-- Messages will be injected here via JS -->
-                <div class="message tutor-message">
-                    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
-                    <div class="bubble">
-                        <p>Welcome to the AI Engineering Tutor platform.</p>
-                        <p>Please type <strong>"Hi"</strong> in the chat box to begin the interactive learning session.</p>
+                    <div class="mockup-body">
+                        <div class="mockup-msg tutor">
+                            <i class="fa-solid fa-robot"></i>
+                            <div class="msg-bubble">Welcome to the AI Engineering Tutor. Let's begin Phase 1. What are your initial thoughts?</div>
+                        </div>
+                        <div class="mockup-msg user">
+                            <i class="fa-regular fa-user"></i>
+                            <div class="msg-bubble">I think we should consider the thermal constraints first.</div>
+                        </div>
+                        <div class="mockup-msg tutor">
+                            <i class="fa-solid fa-robot"></i>
+                            <div class="msg-bubble">Excellent point! How might those thermal constraints impact our material selection?</div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="typing-indicator hidden" id="typing-indicator">
-                <span></span><span></span><span></span>
-            </div>
+        </header>
 
-            <div class="chat-input-area">
-                <div class="input-container">
-                    <textarea id="user-input" placeholder="Type your response here..." rows="1" autofocus></textarea>
-                    <button id="hint-btn" class="hint-btn" title="Get a Hint" aria-label="Get a Hint">
-                        <i class="fa-solid fa-lightbulb"></i>
-                    </button>
-                    <button id="send-btn" class="send-btn">
-                        <i class="fa-solid fa-paper-plane"></i>
-                    </button>
+        <section id="features" class="features-section">
+            <h2>The Learning Experience</h2>
+            <div class="features-grid">
+                <div class="feature-card glass-card">
+                    <div class="feature-icon"><i class="fa-solid fa-list-check"></i></div>
+                    <h3>5-Phase Structure</h3>
+                    <p>Progress logically from problem introduction to final conclusion with distinct, focused phases.</p>
                 </div>
-                <div class="input-footer">
-                    <span><i class="fa-solid fa-circle-info"></i> Press Enter to send, Shift+Enter for new line</span>
+                <div class="feature-card glass-card">
+                    <div class="feature-icon"><i class="fa-solid fa-comments"></i></div>
+                    <h3>Socratic Method</h3>
+                    <p>Learn through guided questioning rather than being handed the answers directly.</p>
+                </div>
+                <div class="feature-card glass-card">
+                    <div class="feature-icon"><i class="fa-solid fa-lightbulb"></i></div>
+                    <h3>ASCIH Framework</h3>
+                    <p>Acknowledge, Support, Challenge, Investigate, and Hint methodology for robust learning.</p>
                 </div>
             </div>
-        </main>
-    </div>
-    
-    <script src="script.js"></script>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 AI Engineering Tutor. All rights reserved.</p>
+    </footer>
 </body>
 </html>
