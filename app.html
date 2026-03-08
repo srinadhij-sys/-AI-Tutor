@@ -84,6 +84,9 @@
                     <button id="fullscreen-btn" class="icon-btn" title="Toggle Fullscreen">
                         <i class="fa-solid fa-expand"></i>
                     </button>
+                    <button id="leaderboard-btn" class="icon-btn" title="View Leaderboard">
+                        <i class="fa-solid fa-trophy"></i>
+                    </button>
                     <button id="reset-btn" class="icon-btn" title="Reset Session">
                         <i class="fa-solid fa-rotate-right"></i>
                     </button>
@@ -120,6 +123,68 @@
                 </div>
             </div>
         </main>
+    </div>
+    
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="modal-overlay hidden">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-trophy" style="color: #FFD700; margin-right: 10px;"></i> Top Performers</h2>
+                <button id="close-leaderboard-btn" class="icon-btn" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="leaderboard-table-container">
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Student Name</th>
+                                <th>Score</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <!-- Rows injected via JS -->
+                            <tr><td colspan="4" style="text-align: center; padding: 20px;">Fetching rankings...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Admin Action Modal -->
+    <div id="admin-modal" class="modal-overlay hidden" style="z-index: 110;">
+        <div class="modal-content glass-card" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="admin-modal-title"><i class="fa-solid fa-lock" style="margin-right: 10px;"></i> Admin Action</h2>
+                <button id="close-admin-btn" class="icon-btn" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="admin-modal-desc" style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 0.95rem;">Please enter the admin password to verify this action.</p>
+                
+                <div id="edit-score-container" class="input-container" style="flex-direction: column; gap: 0.5rem; border: none; padding: 0; background: transparent; margin-bottom: 1.5rem;">
+                    <label for="new-score-input" style="font-size: 0.85rem; color: var(--text-muted);">New Score:</label>
+                    <input type="number" id="new-score-input" placeholder="Enter new score" style="width: 100%; background: var(--panel-bg); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: var(--text-main); font-family: var(--font-sans); font-size: 1rem; padding: 0.8rem; outline: none;">
+                </div>
+                
+                <div class="input-container" style="flex-direction: column; gap: 0.5rem; border: none; padding: 0; background: transparent;">
+                    <label for="admin-password-input" style="font-size: 0.85rem; color: var(--text-muted);">Admin Password:</label>
+                    <input type="password" id="admin-password-input" placeholder="Enter password" style="width: 100%; background: var(--panel-bg); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: var(--text-main); font-family: var(--font-sans); font-size: 1rem; padding: 0.8rem; outline: none;">
+                </div>
+                
+                <p id="admin-error-msg" style="color: var(--error); font-size: 0.85rem; margin-top: 0.8rem; display: none;"></p>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button id="cancel-admin-btn" class="btn" style="flex: 1; padding: 0.8rem; border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: none; cursor: pointer; transition: 0.2s;">Cancel</button>
+                    <button id="confirm-admin-btn" class="btn" style="flex: 1; padding: 0.8rem; border-radius: 8px; background: var(--accent-gradient); color: white; border: none; cursor: pointer; transition: 0.2s; font-weight: 600;">Confirm</button>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script src="script.js"></script>

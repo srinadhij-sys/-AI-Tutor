@@ -1,0 +1,12 @@
+{
+  "name": "ai-tutor",
+  "version": "1.0.0",
+  "description": "AI Tutor App with Vercel KV Leaderboard",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@vercel/kv": "^3.0.0"
+  }
+}
