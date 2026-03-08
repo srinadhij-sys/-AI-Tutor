@@ -1,4 +1,6 @@
-import { kv } from '@vercel/kv';
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
 
 export default async function handler(req, res) {
   // Only allow POST requests
@@ -25,7 +27,7 @@ export default async function handler(req, res) {
 
     if (action === 'delete') {
       // Remove the student from the sorted set
-      await kv.zrem('leaderboard', student_name);
+      await redis.zrem('leaderboard', student_name);
       return res.status(200).json({ success: true, message: 'Record deleted successfully.' });
     } 
     
@@ -34,12 +36,12 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Bad Request. Score must be a number for editing.' });
       }
       // Add or update the student's score
-      await kv.zadd('leaderboard', { score, member: student_name });
+      await redis.zadd('leaderboard', { score, member: student_name });
       return res.status(200).json({ success: true, message: 'Record updated successfully.' });
     }
 
   } catch (error) {
     console.error('Error processing admin action:', error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: error.message });
   }
 }

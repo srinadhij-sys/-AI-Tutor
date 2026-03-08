@@ -1,4 +1,6 @@
-import { kv } from '@vercel/kv';
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
 
 export default async function handler(req, res) {
   // Only allow POST requests
@@ -15,13 +17,11 @@ export default async function handler(req, res) {
     }
 
     // Add or update the student's score in the 'leaderboard' sorted set.
-    // We use kv.zadd to easily manage ranking without race conditions.
-    // The structure is zadd(key, { score: number, member: string })
-    await kv.zadd('leaderboard', { score, member: student_name });
+    await redis.zadd('leaderboard', { score, member: student_name });
 
     return res.status(200).json({ success: true, message: 'Score submitted successfully.' });
   } catch (error) {
     console.error('Error submitting score to KV:', error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: error.message });
   }
 }

@@ -1,4 +1,6 @@
-import { kv } from '@vercel/kv';
+import { Redis } from "@upstash/redis";
+
+const redis = Redis.fromEnv();
 
 export default async function handler(req, res) {
   // Only allow GET requests
@@ -7,22 +9,38 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Fetch the top 100 students from the 'leaderboard' sorted set.
-    // zrange(key, start, stop, options)
-    // rev: true means highest scores first
-    // withScores: true means we get { member, score } objects back
-    const leaderboard = await kv.zrange('leaderboard', 0, 99, { rev: true, withScores: true });
+    const leaderboard = await redis.zrange("leaderboard", 0, 99, {
+      rev: true,
+      withScores: true,
+    });
 
-    // Format the response nicely for the frontend
-    const formattedLeaderboard = leaderboard.map((entry, index) => ({
-      rank: index + 1,
-      student_name: entry.member,
-      score: entry.score,
-    }));
+    // Upstash Redis returns data in an alternating flat array like: ["member1", 100, "member2", 50]
+    // OR it returns [{member: "name", score: 100}] depending on the exact implementation.
+    // The safest way is to ensure we map it to what the frontend expects.
+    let formattedLeaderboard = [];
+    
+    if (Array.isArray(leaderboard)) {
+        if (leaderboard.length > 0 && typeof leaderboard[0] === 'object' && leaderboard[0] !== null) {
+            // It returned an array of objects
+            formattedLeaderboard = leaderboard.map((entry, index) => ({
+                rank: index + 1,
+                student_name: entry.member,
+                score: entry.score,
+            }));
+        } else {
+            // It returned a flat array
+            for (let i = 0; i < leaderboard.length; i += 2) {
+                formattedLeaderboard.push({
+                    rank: (i / 2) + 1,
+                    student_name: leaderboard[i],
+                    score: leaderboard[i + 1]
+                });
+            }
+        }
+    }
 
-    return res.status(200).json({ success: true, leaderboard: formattedLeaderboard });
+    res.status(200).json({ success: true, leaderboard: formattedLeaderboard });
   } catch (error) {
-    console.error('Error fetching leaderboard from KV:', error);
-    return res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: error.message });
   }
 }
