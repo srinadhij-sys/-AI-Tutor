@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const leaderboard = await redis.zrange("leaderboard", 0, 99, {
+    const leaderboard = await redis.zrange("leaderboard", 0, -1, {
       rev: true,
       withScores: true,
     });
