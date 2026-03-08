@@ -74,6 +74,11 @@ const createMessageHTML = (text, isUser = false, feedbackObj = null) => {
         html += `<p>${p}</p>`;
     });
 
+    // Add Answer Accuracy message if available
+    if (feedbackObj && feedbackObj.similarity !== undefined) {
+         html += `<p style="margin-top: 10px; font-weight: 600; font-size: 0.9em; color: var(--primary-color);">🎯 Answer Accuracy: ${feedbackObj.similarity}%</p>`;
+    }
+
     // Add structured feedback if provided
     if (feedbackObj) {
         let tagClass, label;
@@ -90,7 +95,9 @@ const createMessageHTML = (text, isUser = false, feedbackObj = null) => {
         
         html += `
             <div class="feedback-box ${tagClass}">
-                <span class="feedback-tag">${label}</span>
+                <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+                    <span class="feedback-tag" style="margin-bottom: 0;">${label}</span>
+                </div>
                 <p><em>${feedbackObj.hint || feedbackObj.explanation}</em></p>
             </div>
         `;
@@ -116,32 +123,45 @@ const getHintForCurrentQuestion = (state, questionIndex) => {
         [STATE.PHASE1_ANALYZE]: [
             "Think about the main branches of engineering (e.g., software, mechanical, electrical) and how they apply here.",
             "Consider if the problem can be solved by just one type of engineer, or if it needs a team of different experts.",
-            "Imagine how moving parts, power sources, and computer brains work together in this system."
+            "Reflect on what tasks each type of engineer would be responsible for.",
+            "Imagine how moving parts, power sources, and computer brains work together in this system.",
+            "Think about less obvious areas like materials science or human-computer interaction."
         ],
         [STATE.PHASE2_SYNTHESIZE]: [
             "What actual physical parts (sensors, motors) and digital logic (code) are needed?",
             "Which domain knowledge can be safely ignored without breaking the core functionality?",
+            "Focus on the absolute minimum viable theories and mechanisms needed.",
+            "How do these individual pieces act as stepping stones for the whole system?",
             "Why are these specific core components the absolute building blocks for this project?"
         ],
         [STATE.PHASE3_CONTEXTUALIZE]: [
             "Where would this be used in the real world? E.g., a factory, a hospital, or outdoors?",
-            "Think about who the final users are and what their specific needs or limitations might be."
+            "Think about limits like budget, space, weather, or rules and regulations.",
+            "Think about who the final users are and what their specific needs or limitations might be.",
+            "Consider how temperature, dirt, or user wear-and-tear might affect the system.",
+            "Think about the broader impact and the main use cases for the solution."
         ],
         [STATE.PHASE4_INTEGRATE]: [
             "How do the different parts we identified talk to each other to perform a single function?",
-            "Consider the flow of data: what specific rules or connections bind the hardware and software?"
+            "Think about the actual connections: APIs, wires, mechanical joints.",
+            "Consider the flow of data: what specific rules or connections bind the hardware and software?",
+            "Focus on the specific standards or methods used to unite the components.",
+            "How does combining these parts solve the problem better than they could individually?"
         ],
         [STATE.PHASE5_HARMONIZE]: [
             "Does the solution try to maximize performance while keeping the costs and size reasonable?",
-            "Think about balancing user safety, materials cost, efficiency, and ethics."
+            "Think about balancing user safety, materials cost, and efficiency.",
+            "Consider if making it cheaper makes it less safe, or if making it faster uses too much power.",
+            "Why is your chosen balance better than alternative approaches?",
+            "How do all these compromises result in a viable, responsible final product?"
         ]
     };
 
     if (hints[state] && hints[state][questionIndex]) {
-        return `Here's a hint: ${hints[state][questionIndex]} Try answering again.`;
+        return `Here's a hint: ${hints[state][questionIndex]}`;
     }
     
-    return "Here's a hint to guide you: consider the underlying concepts related to software logic, mechanical structure, and their integration. Try answering again.";
+    return "Here's a hint to guide you: consider the underlying concepts related to software logic, mechanical structure, and their integration.";
 };
 
 // Core Logic & Evaluation Engine
@@ -152,52 +172,96 @@ const evaluateAnswer = (input) => {
     if (lower === 'hint' || lower.includes('need a hint') || lower.includes('give me a hint') || lower.includes('can i get a hint')) {
         return { 
             type: 'hint', 
+            status: 'partial',
             hint: getHintForCurrentQuestion(currentState, interactionCount)
         };
     }
 
-    // 1. Is it a question?
-    if (lower.endsWith('?') || lower.startsWith('what') || lower.startsWith('how') || lower.startsWith('why')) {
-        return { type: 'question', hint: "That's a great question. In the context of our analysis, the focus is on breaking down the system into core components. Let's return to the prompt:" };
-    }
-
-    // 2. Does the user not know?
+    // 1. Does the user not know?
     if (lower.includes("don't know") || lower.includes("dont know") || lower.includes("no idea") || lower.includes("not sure")) {
-        return { type: 'dont_know', hint: "That's completely fine. The actual underlying concept involves integrating multiple disciplines. For instance, you would typically need to combine mechanical structures with software logic." };
+        return { type: 'dont_know', status: 'wrong', hint: "That's completely fine. The actual underlying concept typically involves integrating multiple disciplines, such as combining mechanical structures with software logic and electrical sensors." };
     }
 
-    // 3. Evaluate answer quality (mock)
-    const length = input.trim().length;
-    let actualAnswer = "The expected concept here involves the integration of mechanical structures with software control logic.";
+    // 2. Is it a question?
+    if (lower.endsWith('?') || lower.startsWith('what') || lower.startsWith('how') || lower.startsWith('why')) {
+        return { type: 'question', status: 'partial', hint: "That's a great question. In the context of our analysis, the focus is on breaking down the system into its core functional requirements. Let's proceed with our systematic evaluation." };
+    }
+
+    // 3. Evaluate answer quality (simulated similarity percentage)
+    let actualAnswer = "The expected concept here firmly relies on the integration of mechanical structures, real-time sensor data, and sophisticated software control logic.";
     
-    if (length > 40 || lower.includes('and') || lower.includes('because')) {
-        consecutiveFails = 0; // Reset on correct
+    // Simulate a simple word overlap similarity percentage (0-100)
+    const getWords = text => text.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g,"").split(/\s+/).filter(w => w.length > 2);
+    const inputWords = getWords(input);
+    
+    // Check if user is just copying the hint
+    const currentHint = getHintForCurrentQuestion(currentState, interactionCount);
+    const hintWords = getWords(currentHint);
+    const hintSet = new Set(hintWords);
+    
+    let hintMatchCount = 0;
+    inputWords.forEach(word => {
+        if (hintSet.has(word)) hintMatchCount++;
+    });
+    
+    const inputHintRate = inputWords.length > 0 ? (hintMatchCount / inputWords.length) * 100 : 0;
+    
+    if (inputHintRate > 60) {
+        return {
+            type: 'answer',
+            status: 'wrong',
+            hint: "Please try to explain the concept in your own words instead of repeating the hint I provided. Actual Answer: " + actualAnswer,
+            similarity: 0
+        };
+    }
+
+    const targetWords = getWords(actualAnswer);
+    
+    const targetSet = new Set(targetWords);
+    let matchCount = 0;
+    inputWords.forEach(word => {
+        if (targetSet.has(word)) matchCount++;
+    });
+    
+    let similarityPercent = targetSet.size > 0 ? (matchCount / targetSet.size) * 100 : 0;
+    
+    // Bonus points for input length and conjunctions to simulate semantic richness
+    const length = input.trim().length;
+    if (length > 40) similarityPercent += 15;
+    if (lower.includes('and') || lower.includes('because') || lower.includes('therefore')) similarityPercent += 15;
+    
+    similarityPercent = Math.min(100, Math.max(0, similarityPercent));
+
+    // Threshold evaluation based on requested rules:
+    // Minimum similarity > 40% -> Acceptable answer
+    const similarityDisplay = Math.round(similarityPercent);
+    
+    if (similarityPercent > 40) {
         return { 
             type: 'answer', 
             status: 'correct', 
-            hint: "You accurately identified the key components here." 
+            hint: `Great response! You accurately identified the key components. To add to that: ${actualAnswer}`,
+            similarity: similarityDisplay
         };
     } 
     
-    consecutiveFails++;
-    const showAnswer = consecutiveFails >= 2;
-    
-    if (length > 15) {
+    // Similarity between 20% and 40% -> Partial/Wrong based on context
+    // We treat 20-40% as a Partial answer to encourage users
+    if (similarityPercent >= 20 && similarityPercent <= 40) {
         return { 
             type: 'answer', 
             status: 'partial', 
-            hint: showAnswer 
-                ? `You are partially correct about that aspect, but we also need to consider the broader scope.\n\n**Actual Answer:** ${actualAnswer}`
-                : `You are partially correct about that aspect. Hint: Try to also consider the software control mechanisms. Try answering again.`
+            hint: `You are partially correct about that aspect, but we need to consider the broader scope. Actual Answer: ${actualAnswer}`,
+            similarity: similarityDisplay
         };
     }
 
+    // Similarity < 20% -> Wrong answer
     return { 
         type: 'answer', 
         status: 'wrong', 
-        hint: showAnswer
-            ? `I see what you're thinking, but the core element involves a slightly different approach.\n\n**Actual Answer:** ${actualAnswer}`
-            : `I see what you're thinking, but think broader. Hint: Look at the problem from different engineering disciplines. Try answering again.`
+        hint: `I understand your perspective, but the core element involves a highly different approach. Actual Answer: ${actualAnswer}`,
+            similarity: similarityDisplay
     };
 };
 
@@ -234,9 +298,7 @@ const handleStateTransition = (input) => {
             break;
 
         case STATE.AWAITING_NAME:
-            // Very simple capture - in reality, might want NLP to extract just the name from "my name is Alex"
             userName = input.replace(/my name is|i am|i'm/gi, '').trim();
-            // Capitalize first letter
             if(userName.length > 0) {
                 userName = userName.charAt(0).toUpperCase() + userName.slice(1);
             } else {
@@ -248,13 +310,18 @@ const handleStateTransition = (input) => {
             break;
 
         case STATE.PROJECT_SELECTION:
-            if (input.length > 5) {
+            if (lowerInput === 'yes' || lowerInput === 'sure' || lowerInput === 'proceed') {
+                currentProject = "Smart Autonomous System";
+                currentState = STATE.PHASE1_ANALYZE;
+                updateSidebarProgress(1); // Nav Phase 1
+                responseText = `Thank you, ${userName}. We will analyze the **${currentProject}**.\n\n**Phase 1: Analyze (Identify Domains)**\n\nOur goal in this phase is to examine the various domains of knowledge involved.\n\nWhat are the different domains of knowledge involved in this problem?`;
+            } else if (input.length > 3) {
                 currentProject = input;
                 currentState = STATE.PHASE1_ANALYZE;
                 updateSidebarProgress(1); // Nav Phase 1
                 responseText = `Thank you, ${userName}. We will analyze the **${currentProject}**.\n\n**Phase 1: Analyze (Identify Domains)**\n\nOur goal in this phase is to examine the various domains of knowledge involved.\n\nWhat are the different domains of knowledge involved in this problem?`;
             } else {
-                responseText = "Please provide a more descriptive engineering project to analyze.";
+                responseText = "Please provide a more descriptive engineering project to analyze, or reply 'yes' to use a suggested one.";
             }
             appendMessage(responseText);
             break;
@@ -262,12 +329,14 @@ const handleStateTransition = (input) => {
         case STATE.PHASE1_ANALYZE:
             handlePhaseLogic(
                 input, 
-                3, // Number of interactions
+                5, // Number of interactions
                 STATE.PHASE2_SYNTHESIZE, 
                 2, // Progress Idx
                 [
                     "Does this problem require knowledge beyond a single discipline?",
-                    "How might these different disciplines intersect to form a complete understanding of the system?"
+                    "What specific roles would each of these disciplines play in the overall project?",
+                    "How might these different disciplines intersect to form a complete understanding of the system?",
+                    "Are there any secondary domains that might not be obvious at first but are still necessary?"
                 ],
                 `**Phase 1 Summary: Domain Analysis**\nThe actual domains required for the **${currentProject}** generally include Mechanical Engineering for physical infrastructure, Electrical Engineering for power and sensors, and Computer Science for control algorithms. Each plays a distinct role in ensuring the system functions physically and logically.\n\n**We are now moving to the next phase.**\n\n**Phase 2: Synthesize (Extract Domain Knowledge)**\n\nWhat hardware and software components are specifically involved in these domains?`
             );
@@ -275,10 +344,12 @@ const handleStateTransition = (input) => {
             
         case STATE.PHASE2_SYNTHESIZE:
             handlePhaseLogic(
-                input, 3, STATE.PHASE3_CONTEXTUALIZE, 3,
+                input, 5, STATE.PHASE3_CONTEXTUALIZE, 3,
                 [
                     "Which domain knowledge can be excluded as non-essential for the core functionality?",
-                    "Why are the remaining components absolutely necessary for the foundation of the project?"
+                    "What are the core conceptual building blocks required from each of the remaining domains?",
+                    "How do these extracted components form the basis of a viable solution?",
+                    "Why are these remaining components absolutely necessary for the foundation of the project?"
                 ],
                 `**Phase 2 Summary: Synthesize**\nThe essential concepts drawn from these domains include microcontroller processing, sensor data acquisition, and actuator mechanics. They prepare the groundwork by providing the necessary means to read the environment and execute actions.\n\n**We are now moving to the next phase.**\n\n**Phase 3: Contextualize (Situate the Problem)**\n\nIn what real-world setting does this problem occur?`
             );
@@ -286,9 +357,12 @@ const handleStateTransition = (input) => {
 
         case STATE.PHASE3_CONTEXTUALIZE:
             handlePhaseLogic(
-                input, 2, STATE.PHASE4_INTEGRATE, 4,
+                input, 5, STATE.PHASE4_INTEGRATE, 4,
                 [
-                    "What are the applications of this problem, and who are the end-users?"
+                    "What are the key constraints in this environment (e.g., physical, financial, regulatory)?",
+                    "Who are the end-users and what are their specific needs or limitations?",
+                    "How might the environment affect the performance or durability of the solution?",
+                    "What are the overall applications of this problem, and how does the context dictate the required design?"
                 ],
                 `**Phase 3 Summary: Contextualize**\nThe real-world setting involves dynamic environments where constraints such as weather, cost, and user safety play a massive role. These contextual conditions dictate how robust the final solution must be.\n\n**We are now moving to the next phase.**\n\n**Phase 4: Integrate (Combine Contents)**\n\nHow can the selected components from different domains be combined effectively?`
             );
@@ -296,9 +370,12 @@ const handleStateTransition = (input) => {
 
         case STATE.PHASE4_INTEGRATE:
              handlePhaseLogic(
-                input, 2, STATE.PHASE5_HARMONIZE, 5,
+                input, 5, STATE.PHASE5_HARMONIZE, 5,
                 [
-                    "What specific relationships or communication protocols exist between the hardware and software components?"
+                    "What relationships or interfaces exist between the hardware and software components?",
+                    "How does data or power flow through this integrated system?",
+                    "What specific communication protocols or mechanical linkages are necessary to bind these parts?",
+                    "How does this combined approach systematically address the original problem?"
                 ],
                 `**Phase 4 Summary: Integrate**\nThe integrated workflow requires a seamless loop: sensors (electrical) capture data, software algorithms (computer science) process it, and mechanical components execute the response, addressing the problem collectively.\n\n**We are now moving to the next phase.**\n\n**Phase 5: Harmonize (Balance and Trade-offs)**\n\nDoes the integrated solution appropriately balance technical performance with the contextual constraints we discussed?`
             );
@@ -306,19 +383,22 @@ const handleStateTransition = (input) => {
             
         case STATE.PHASE5_HARMONIZE:
              handlePhaseLogic(
-                input, 2, STATE.CONCLUSION, 6,
+                input, 5, STATE.CONCLUSION, 6,
                 [
-                    "What trade-offs exist between cost, efficiency, safety, ethics, or usability in your solution?"
+                    "What trade-offs exist between cost, efficiency, and usability in your solution?",
+                    "Are there any safety or ethical considerations that need to be prioritized over raw performance?",
+                    "How would you justify the final choices made in balancing these conflicting requirements?",
+                    "How does the final solution achieve overall coherence and responsibility?"
                 ],
                 `**Phase 5 Summary: Harmonize**\nThe harmonized solution resolves the tension between high efficiency and cost constraints by selecting optimized, mid-tier components. This achieves a coherent and responsible design.\n\n**Session Conclusion**\n\nThe structured process we just used to analyze your project is known as the **ASCIH framework**:\n- **Analyze** (Identify Domains)\n- **Synthesize** (Extract Domain Knowledge)\n- **Contextualize** (Situate the Problem)\n- **Integrate** (Combine Contents)\n- **Harmonize** (Balance and Trade-offs)\n\nThis framework provides a systematic approach to interdisciplinary engineering problems.\n\nAre you interested in continuing the interaction with another example project?`
             );
             break;
 
         case STATE.CONCLUSION:
-            if (lowerInput.includes('yes') || lowerInput.includes('sure')) {
+            if (lowerInput.includes('yes') || lowerInput.includes('sure') || lowerInput.includes('yep') || lowerInput.includes('ok') || lowerInput.includes('interested')) {
                 currentState = STATE.FOLLOW_UP;
                 updateSidebarProgress(1); // Reset visually
-                appendMessage("Excellent. Please provide the next engineering project you would like to analyze, or tell me your engineering domain and I can suggest one for you.");
+                appendMessage("Excellent. Please provide the next engineering project you would like to analyze. Alternatively, you can tell me your engineering domain, and I can suggest a project for you.");
             } else {
                 appendMessage("Thank you for participating in this learning session. The activity is now concluded.");
                 elements.userInput.disabled = true;
@@ -327,11 +407,17 @@ const handleStateTransition = (input) => {
             break;
             
         case STATE.FOLLOW_UP:
-            currentProject = input;
-            currentState = STATE.PHASE1_ANALYZE;
-            interactionCount = 0;
-            updateSidebarProgress(1);
-            appendMessage(`Understood. We will now apply the ASCIH framework to the **${currentProject}**.\n\n**Phase 1: Analyze (Identify Domains)**\n\nWhat are the different domains of knowledge involved in this problem?`);
+            if (lowerInput.includes('suggest') || lowerInput.includes('domain') || input.length < 20) {
+                 const domain = input.replace(/suggest|my domain is|my domain/gi, '').trim() || 'your domain';
+                 appendMessage(`Based on ${domain}, I suggest analyzing a **Smart Automation System**. Would you like to proceed with this project? (Reply "yes" or specify your own project)`);
+                 currentState = STATE.PROJECT_SELECTION;
+            } else {
+                 currentProject = input;
+                 currentState = STATE.PHASE1_ANALYZE;
+                 interactionCount = 0;
+                 updateSidebarProgress(1);
+                 appendMessage(`Understood. We will now apply the ASCIH framework to the **${currentProject}**.\n\n**Phase 1: Analyze (Identify Domains)**\n\nWhat are the different domains of knowledge involved in this problem?`);
+            }
             break;
     }
 };
@@ -340,38 +426,27 @@ const handlePhaseLogic = (input, maxQuestions, nextState, nextNavIdx, followUpQu
     // 1. Evaluate answer based on new guidelines
     const evalResult = evaluateAnswer(input);
     
-    let feedback = null;
+    let feedback = { status: evalResult.status || 'partial', hint: evalResult.hint };
 
     if (evalResult.type === 'hint') {
-        feedback = { status: 'partial', hint: evalResult.hint };
         appendMessage(feedback.hint, false, feedback);
-        return; // Early return to force them to try again without advancing the phase interaction count
-    } else if (evalResult.type === 'question') {
-        feedback = { status: 'partial', hint: evalResult.hint };
-    } else if (evalResult.type === 'dont_know') {
-        feedback = { status: 'wrong', hint: evalResult.hint };
-    } else {
-        // evaluation of provided answer
-        let statObj = 'partial';
-        if(evalResult.status === 'correct') statObj = 'correct';
-        if(evalResult.status === 'wrong') statObj = 'wrong';
-        feedback = { status: statObj, hint: evalResult.hint };
-        
-        // If they failed but we haven't shown the actual answer yet (consecutiveFails < 2),
-        // we should prompt them to try again instead of moving to the next question.
-        if ((statObj === 'wrong' || statObj === 'partial') && consecutiveFails < 2) {
-             appendMessage(feedback.hint, false, feedback);
-             return; // Early return to force them to try again without advancing the phase interaction count
-        }
+        return; // Early return so they can answer the actual question
+    }
+    
+    // Only increment interaction count if the answer is considered 'correct' (> 40% similarity)
+    if (evalResult.status === 'correct') {
+        interactionCount++;
     }
 
-    // Only increment interaction count if correct, 'don't know', question handled, or if we revealed the actual answer
-    interactionCount++;
-
     // 2. Determine Next Action
-    if (interactionCount < maxQuestions) {
-        // Ask Next Question in the phase
-        const nextQ = followUpQuestions[interactionCount - 1];
+    if (evalResult.status !== 'correct') {
+        // Answer is partial (20-40%) or wrong (<20%)
+        // Stay on current question, give hint
+        // Do not increment interaction count. Just give feedback and let them try again.
+        appendMessage(feedback.hint, false, feedback);
+    } else if (interactionCount < maxQuestions) {
+        // Answer is correct, and we have more questions in the phase
+        const nextQ = followUpQuestions[interactionCount - 1]; // Because we incremented it
         appendMessage(nextQ, false, feedback);
     } else {
         // Phase Complete! Transition to next
