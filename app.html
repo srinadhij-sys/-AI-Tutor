@@ -187,6 +187,30 @@
         </div>
     </div>
     
+    <!-- Leaderboard Password Gate Modal -->
+    <div id="lb-password-modal" class="modal-overlay hidden" style="z-index: 120;">
+        <div class="modal-content glass-card" style="max-width: 380px;">
+            <div class="modal-header">
+                <h2><i class="fa-solid fa-lock" style="margin-right: 10px; color: #FFD700;"></i> Leaderboard Access</h2>
+                <button id="close-lb-password-btn" class="icon-btn" title="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 0.95rem;">This area is restricted. Please enter the password to view the leaderboard.</p>
+                <div class="input-container" style="flex-direction: column; gap: 0.5rem; border: none; padding: 0; background: transparent;">
+                    <label for="lb-password-input" style="font-size: 0.85rem; color: var(--text-muted);">Password:</label>
+                    <input type="password" id="lb-password-input" placeholder="Enter password" style="width: 100%; background: var(--panel-bg); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: var(--text-main); font-family: var(--font-sans); font-size: 1rem; padding: 0.8rem; outline: none; box-sizing: border-box;">
+                </div>
+                <p id="lb-password-error" style="color: var(--error); font-size: 0.85rem; margin-top: 0.8rem; display: none;">Incorrect password. Access denied.</p>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button id="cancel-lb-password-btn" class="btn" style="flex: 1; padding: 0.8rem; border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: none; cursor: pointer; transition: 0.2s;">Cancel</button>
+                    <button id="confirm-lb-password-btn" class="btn" style="flex: 1; padding: 0.8rem; border-radius: 8px; background: var(--accent-gradient); color: white; border: none; cursor: pointer; transition: 0.2s; font-weight: 600;">Access</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
