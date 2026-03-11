@@ -266,10 +266,11 @@ const handleStateTransition = async (input) => {
                 updateSidebarProgress(1);
                 appendMessage('Excellent! Please provide the next engineering project you would like to analyze, or tell me your engineering domain and I can suggest one for you.');
             } else {
-                appendMessage('Thank you for participating in this learning session. The activity is now concluded.');
+                appendMessage('Thank you for participating in this learning session. The activity is now concluded. The page will refresh automatically.');
                 elements.userInput.disabled = true;
                 elements.sendBtn.disabled = true;
                 elements.hintBtn.disabled = true;
+                setTimeout(() => location.reload(), 3000);
             }
             break;
 
@@ -371,19 +372,13 @@ const handlePhaseAnswer = async (input) => {
         });
     } else {
         failCount++;
-        if (failCount >= 3) {
-            // Third Attempt Failed: Reveal Answer and Move On
+        if (failCount >= 1) {
+            // First Attempt Failed: Reveal Answer and Move On
             failCount = 0;
             totalScore += evaluation.similarity_score;
             advancePhase(phase, {
                 status: 'wrong',
                 hint: `${evaluation.message} You scored ${evaluation.similarity_score}%. Let me reveal the actual appropriate answer: ${PHASE_ANSWERS[currentPhaseIdx]}`
-            });
-        } else {
-            // First/Second Attempt Failed: Prompt to Try Again with Hint
-            appendMessage('', false, {
-                status: evaluation.status,
-                hint: `${evaluation.message}\n\n💡 Hint: ${evaluation.hint}\n\nPlease try again (Attempt ${failCount}/3).`
             });
         }
     }
