@@ -92,7 +92,7 @@ const PHASES = [
         goal: 'Resolve trade-offs and ensure the solution is feasible and sustainable.',
         question: 'We have successfully integrated our components into a unified workflow. Now, we are moving to the next phase: evaluating and balancing this system. Looking critically at what we\'ve designed, does the integrated solution appropriately balance ideal technical performance with the strict contextual constraints we defined earlier?',
         keywords: ['speed', 'safety', 'trade-off', 'efficiency', 'balance', 'stop', 'sensor', 'person', 'detect', 'slow', 'fast', 'profit', 'cost', 'risk', 'cycle', 'human', 'response', 'time'],
-        summary: `Thank you for making those tough decisions. Here is a complete harmonization summary detailing how our solution responsibly balances competing demands:\n\no Resolved Trade-offs: Prioritizing human safety and bounded motion over maximum arm speed – This clarifies what was sacrificed and what was gained.\no Justifications for Priorities: The operating environment requires safe human collaboration (cobot) – This defends the integrity and logic of the design.\no Sustainability & Ethics: Adherence to safety standards and reliable long-term parts ensures minimal harm to operators – This ensures the solution is viable for the future without causing undue harm.\no The Harmonized Solution: A collaborative robotic arm using PID-controlled servos with strict mechanical bounds and safety interruptions – This is our realistic, actionable, and mature blueprint.\n\n**Session Conclusion**\n\nThe structured process we used to analyze your project is known as the **ASCIH framework**:\n- **Analyze** (Identify Domains)\n- **Synthesize** (Extract Domain Knowledge)\n- **Contextualize** (Situate the Problem)\n- **Integrate** (Combine Contents)\n- **Harmonize** (Balance and Trade-offs)\n\nThis framework provides a systematic approach to interdisciplinary engineering problems.\n\nAre you interested in continuing the interaction with another example project?`,
+        summary: `Thank you for making those tough decisions. Here is a complete harmonization summary detailing how our solution responsibly balances competing demands:\n\no Resolved Trade-offs: Prioritizing human safety and bounded motion over maximum arm speed – This clarifies what was sacrificed and what was gained.\no Justifications for Priorities: The operating environment requires safe human collaboration (cobot) – This defends the integrity and logic of the design.\no Sustainability & Ethics: Adherence to safety standards and reliable long-term parts ensures minimal harm to operators – This ensures the solution is viable for the future without causing undue harm.\no The Harmonized Solution: A collaborative robotic arm using PID-controlled servos with strict mechanical bounds and safety interruptions – This is our realistic, actionable, and mature blueprint.\n\n**Session Conclusion**\n\nThe structured process we used to analyze your project is known as the **ASCIH framework**:\n\n- **Analyze** **(Identify Domains)**\n\n- **Synthesize** **(Extract Domain Knowledge)**\n\n- **Contextualize** **(Situate the Problem)**\n\n- **Integrate** **(Combine Contents)**\n\n- **Harmonize** **(Balance and Trade-offs)**\n\nThis framework provides a systematic approach to interdisciplinary engineering problems.\n\nAre you interested in continuing the interaction with another example project?`,
         navIdx: 5,
         nextState: STATE.CONCLUSION
     }
@@ -105,6 +105,7 @@ let userName = '';
 let currentPhaseIdx = 0;   // index into PHASES array (0–4)
 let failCount = 0;         // consecutive fails for current question within a phase
 let allSubmittedAnswers = [];// remember all user answers to reject repeats globally
+let totalScore = 0;        // cumulative score across phases
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 const showTyping = () => {
@@ -175,7 +176,7 @@ const computeSimilarity = (userAnswer, phaseKeywords) => {
  * < 20 → wrong, 20–40 → partial, > 40 → acceptable
  */
 const classifySimilarity = (score) => {
-    if (score >= 41) return 'correct';
+    if (score >= 40) return 'correct';
     if (score >= 20) return 'partial';
     return 'wrong';
 };
@@ -207,15 +208,12 @@ const processUserInput = async (input) => {
     elements.userInput.style.height = 'auto';
 
     showTyping();
-    const delay = Math.random() * 800 + 900;
-    setTimeout(() => {
-        handleStateTransition(input);
-        hideTyping();
-    }, delay);
+    await handleStateTransition(input);
+    hideTyping();
 };
 
 // ─── State Machine ────────────────────────────────────────────────────────────
-const handleStateTransition = (input) => {
+const handleStateTransition = async (input) => {
     const lowerInput = input.toLowerCase().trim();
 
     switch (currentState) {
@@ -245,6 +243,7 @@ const handleStateTransition = (input) => {
                 currentPhaseIdx = 0;
                 failCount = 0;
                 allSubmittedAnswers = [];
+                totalScore = 0;
                 updateSidebarProgress(1);
                 const p = PHASES[0];
                 appendMessage(`Thank you, ${userName}. We will analyze the **${currentProject}**.\n\n**${p.name}**\n\n*Goal: ${p.goal}*\n\n${p.question}`);
@@ -258,7 +257,7 @@ const handleStateTransition = (input) => {
         case STATE.PHASE3:
         case STATE.PHASE4:
         case STATE.PHASE5:
-            handlePhaseAnswer(input);
+            await handlePhaseAnswer(input);
             break;
 
         case STATE.CONCLUSION:
@@ -280,6 +279,7 @@ const handleStateTransition = (input) => {
             currentPhaseIdx = 0;
             failCount = 0;
             allSubmittedAnswers = [];
+            totalScore = 0;
             updateSidebarProgress(1);
             const p0 = PHASES[0];
             appendMessage(`Understood. We will now apply the ASCIH framework to the **${currentProject}**.\n\n**${p0.name}**\n\n*Goal: ${p0.goal}*\n\n${p0.question}`);
@@ -287,19 +287,66 @@ const handleStateTransition = (input) => {
     }
 };
 
+// ─── Gemini API Integration ───────────────────────────────────────────────────
+const GEMINI_API_KEY = 'AIzaSyBWfWUll9RIJpvznBjgKBrNdP-N__El_xU';
+
+const generateGeminiFeedback = async (phase, userAnswer) => {
+    const systemInstruction = `You are evaluating a student's answer for an engineering project: ${currentProject}.
+Current Phase: ${phase.name}
+Question Asked: ${phase.question}
+Expected Core Concepts: ${PHASE_ANSWERS[currentPhaseIdx]}
+
+Your task is to compare the student's answer with the expected core concepts based on MEANING, not exact wording.
+You MUST respond IN PURE JSON format with exactly these four fields (do not wrap in markdown):
+{
+  "similarity_score": <number between 0 and 100>,
+  "status": "<'correct' if score >= 40, 'partial' if score 20-39, 'wrong' if score < 20>",
+  "message": "<Acknowledge response. Point out what is correct and incorrect/irrelevant. If the status is correct, encourage them.>",
+  "hint": "<If the answer is wrong or partial, provide a helpful guiding hint that gives direction but DOES NOT reveal the correct answer.>"
+}
+
+Rules:
+1. If the user asks a question, answer it in 'message' and provide a logical hint.
+2. If the user explicitly says they don't know, score it 0, mark as wrong.
+3. Keep the message concise (1-3 sentences) and the hint concise (1-2 sentences).`;
+
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: `User's Answer: "${userAnswer}"` }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] },
+                generationConfig: { 
+                    temperature: 0.2,
+                    responseMimeType: "application/json" 
+                }
+            })
+        });
+        
+        const data = await response.json();
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            return JSON.parse(data.candidates[0].content.parts[0].text);
+        }
+    } catch (e) {
+        console.error('Gemini error:', e);
+    }
+    
+    // Fallback if API fails
+    const fallbackScore = computeSimilarity(userAnswer, phase.keywords);
+    const fallbackStatus = classifySimilarity(fallbackScore);
+    return {
+        similarity_score: fallbackScore,
+        status: fallbackStatus,
+        message: "I processed your answer locally due to a network issue.",
+        hint: `Hint: ${PHASE_HINTS[currentPhaseIdx]}`
+    };
+};
+
 // ─── Phase Answer Handler ─────────────────────────────────────────────────────
-const handlePhaseAnswer = (input) => {
+const handlePhaseAnswer = async (input) => {
     const phase = PHASES[currentPhaseIdx];
     const lowerInput = input.toLowerCase().trim();
-
-    // ── Hint request (typed or button) ──
-    if (lowerInput === 'hint' || lowerInput.includes('need a hint') || lowerInput.includes('give me a hint') || lowerInput.includes('can i get a hint')) {
-        appendMessage('', false, {
-            status: 'partial',
-            hint: `💡 Hint: ${PHASE_HINTS[currentPhaseIdx]}`
-        });
-        return;
-    }
 
     // ── Reject repeated / identical answer ──
     if (lowerInput.length > 0 && allSubmittedAnswers.includes(lowerInput)) {
@@ -312,34 +359,36 @@ const handlePhaseAnswer = (input) => {
 
     allSubmittedAnswers.push(lowerInput);
 
-    // ── Similarity evaluation ──
-    const score = computeSimilarity(input, phase.keywords);
-    const classification = classifySimilarity(score);
+    // Dynamic Gemini Evaluation
+    const evaluation = await generateGeminiFeedback(phase, input);
 
-    let finalFeedback = '';
-    let statusClass = '';
-
-    // ── "Don't know" shortcut ──
-    if (lowerInput.includes("don't know") || lowerInput.includes("dont know") || lowerInput.includes("no idea") || lowerInput.includes("not sure")) {
-        finalFeedback = `That's okay! Here is the appropriate answer: ${PHASE_ANSWERS[currentPhaseIdx]}`;
-        statusClass = 'wrong';
-    } else if (classification === 'correct') {
-        finalFeedback = `Well done! You identified the key concepts accurately. ${PHASE_ANSWERS[currentPhaseIdx]}`;
-        statusClass = 'correct';
-    } else if (classification === 'partial') {
-        finalFeedback = `You're partially correct, but there is more to it. ${PHASE_ANSWERS[currentPhaseIdx]}`;
-        statusClass = 'partial';
+    if (evaluation.status === 'correct') {
+        failCount = 0;
+        totalScore += evaluation.similarity_score;
+        advancePhase(phase, {
+            status: 'correct',
+            hint: `${evaluation.message} You scored ${evaluation.similarity_score}%. That is correct! Moving to the next phase.`
+        });
     } else {
-        finalFeedback = `That's not exactly what we're looking for, but let me provide the actual appropriate answer: ${PHASE_ANSWERS[currentPhaseIdx]}`;
-        statusClass = 'wrong';
+        failCount++;
+        if (failCount >= 3) {
+            // Third Attempt Failed: Reveal Answer and Move On
+            failCount = 0;
+            totalScore += evaluation.similarity_score;
+            advancePhase(phase, {
+                status: 'wrong',
+                hint: `${evaluation.message} You scored ${evaluation.similarity_score}%. Let me reveal the actual appropriate answer: ${PHASE_ANSWERS[currentPhaseIdx]}`
+            });
+        } else {
+            // First/Second Attempt Failed: Prompt to Try Again with Hint
+            appendMessage('', false, {
+                status: evaluation.status,
+                hint: `${evaluation.message}\n\n💡 Hint: ${evaluation.hint}\n\nPlease try again (Attempt ${failCount}/3).`
+            });
+        }
     }
-
-    // Advance Phase IMMEDIATELY (1 question per phase rule)
-    advancePhase(phase, {
-        status: statusClass,
-        hint: finalFeedback
-    });
 };
+
 
 // ─── Phase Advancement ────────────────────────────────────────────────────────
 const advancePhase = (phase, feedbackObj) => {
@@ -355,6 +404,15 @@ const advancePhase = (phase, feedbackObj) => {
 
     if (currentState === STATE.CONCLUSION) {
         updateSidebarProgress(6); // conclusion nav
+        
+        // Calculate and submit final score
+        const finalScore = Math.round(totalScore / 5);
+        fetch('/api/submit-score', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ student_name: userName, score: finalScore })
+        }).catch(e => console.error("Error submitting score:", e));
+        
     } else if (currentPhaseIdx < PHASES.length) {
         // Ask next phase question
         const nextPhase = PHASES[currentPhaseIdx];
