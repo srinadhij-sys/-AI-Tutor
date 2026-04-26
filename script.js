@@ -48,70 +48,75 @@ const PHASES = [
     {
         key: 'phase1',
         name: 'Phase 1: Analyze (Identify Domains)',
-        goal: 'Identify and examine the various domains of knowledge involved.',
+        goal: 'Help the student identify core and secondary disciplines involved in their project.',
+        transition: '',
         interactions: [
-            "To tackle this problem, we first need to understand the knowledge required. What would you say is the primary field or core discipline at the heart of this issue?",
-            "Why did you select this domain?",
-            "Every complex problem pulls from multiple areas of expertise, but not all carry equal weight. Besides the core discipline you just identified, what are two or three secondary fields that are absolutely essential to making a solution actually work in the real world?",
-            "Why did you select these secondary domains?"
+            { text: "To tackle this problem, we first need to understand the knowledge required. What would you say is the primary field or core discipline at the heart of this issue?", hint: "Think about what kind of engineer or specialist would be most essential to solve this problem from scratch. What is the dominant technical area \u2014 is it mechanical, electrical, software, biological, or something else?" },
+            { text: "Why did you select this domain as the primary one?", hint: "Ask them to justify their choice based on the core functionality of the project." },
+            { text: "Every complex problem pulls from multiple areas of expertise, but not all carry equal weight. Besides the core discipline you just identified, what are two or three secondary fields that are absolutely essential to making a solution actually work in the real world?", hint: "Consider what else the solution needs beyond the core \u2014 does it need to communicate data? Be manufactured? Meet safety regulations? Interact with people? Each of those needs points to a supporting discipline." },
+            { text: "Why did you select these secondary domains?", hint: "Ask them to explain how those secondary domains support the primary function." }
         ],
-        summaryTemplate: `Thank you for exploring this. Here is a complete analysis of the domains required to fully understand this problem:\n\no Core Technical Domain(s): [Name Domain] \u2013 Role: [Why it's needed based on AI's expert analysis + user input].\no Supporting/Integrative Domain(s): [Name Domain] \u2013 Role: [Why it's needed].\no Contextual/Systemic Domain(s): [Name Domain] \u2013 Role: [Why it's needed].`,
+        summaryTemplate: `Thank you for exploring this. Here is a complete analysis of the domains required to fully understand this problem:\n\n\u2022 Core Technical Domain(s): [Name] \u2013 Role: [Why it's needed]\n\u2022 Supporting/Integrative Domain(s): [Name] \u2013 Role: [Why it's needed]\n\u2022 Contextual/Systemic Domain(s): [Name] \u2013 Role: [Why it's needed]`,
         navIdx: 1,
         nextState: STATE.PHASE2
     },
     {
         key: 'phase2',
         name: 'Phase 2: Synthesize (Extract Domain Knowledge)',
-        goal: 'Extract essential components and methods from the identified domains.',
+        goal: 'Identify specific building blocks \u2014 hardware, software, and theoretical concepts.',
+        transition: 'We have successfully mapped out the domains. Now, we are moving to the next phase: identifying the specific building blocks within those domains.',
         interactions: [
-            "We have successfully mapped out the domains. Now, we are moving to the next phase: identifying the specific building blocks within those domains. Looking at the fields we just discussed, what specific hardware, are essential to understand this problem?",
-            "Why did you select this hardware?",
-            "Looking at the fields we just discussed, what specific software, or theoretical concepts are essential to understand this problem?",
-            "Why did you select this software or theoretical concept?"
+            { text: "Looking at the fields we just discussed, what specific hardware components are essential to understand this problem?", hint: "Think about the physical parts of the solution \u2014 sensors, processors, actuators, power sources, structural components. What physical items must exist for the system to function?" },
+            { text: "Why did you select this hardware?", hint: "Ask them to justify the physical components." },
+            { text: "What specific software tools, algorithms, or theoretical concepts are essential to understand this problem?", hint: "Think about the invisible layer of the solution \u2014 what logic runs the hardware? What math or theory explains the behavior? Consider control systems, communication protocols, data processing, or design principles." },
+            { text: "Why did you select this software or concept?", hint: "Ask them to justify the logical components." }
         ],
-        summaryTemplate: `Thank you for narrowing that down. Here is a complete synthesis of the essential concepts drawn from each domain, which will serve as the groundwork for our solution:\n\no Essential Components (Hardware/Software): [List extracted elements] \u2013 Required because: [AI summary of the user's 'why'].\no Essential Methods & Concepts: [List extracted methods] \u2013 Required because: [AI summary of purpose].\no System Boundaries (Excluded Elements): [List excluded items] \u2013 Excluded because: [AI summary of why they fall outside the scope].`,
+        summaryTemplate: `Thank you for narrowing that down. Here is a complete synthesis of the essential concepts:\n\n\u2022 Essential Components (Hardware/Software): [List] \u2013 Required because: [reason]\n\u2022 Essential Methods & Concepts: [List] \u2013 Required because: [reason]\n\u2022 System Boundaries (Excluded Elements): [List] \u2013 Excluded because: [reason]`,
         navIdx: 2,
         nextState: STATE.PHASE3
     },
     {
         key: 'phase3',
         name: 'Phase 3: Contextualize (Situate the Problem)',
-        goal: 'Situate the project within a real-world setting.',
+        goal: 'Place the solution in a real-world setting and identify users, constraints, and environment.',
+        transition: 'We have successfully isolated our essential components and methods. Now, we are moving to the next phase: situating this knowledge in the real world.',
         interactions: [
-            "We have successfully isolated our essential components and methods. Now, we are moving to the next phase: situating this knowledge in the real world. In what specific real-world setting does this problem occur, or what are the primary applications of this problem?",
-            "Why did you select this application?",
-            "What are the other applications of this problem?",
-            "Why did you select these other applications?"
+            { text: "In what specific real-world setting does this problem occur, or what are the primary applications of this problem?", hint: "Who is actually using this system and where? Is it deployed in a factory, a hospital, a home, outdoors? Think about the environment where someone would switch this on for the first time." },
+            { text: "Why did you select this application?", hint: "Ask them to explain their reasoning for this setting." },
+            { text: "What are the other applications of this problem beyond the primary one?", hint: "Think across industries \u2014 could the same technology be used in agriculture, defense, education, logistics, or healthcare? What other problems share a similar structure?" },
+            { text: "Why did you select this application?", hint: "Ask for justification on these secondary applications." }
         ],
-        summaryTemplate: `Thank you for giving a complete picture of the environment. Here is a comprehensive summary of the real-world context that will serve as the operational boundary for our solution:\n\no Real-World Setting & Application: [AI summary of where this takes place] \u2013 This dictates our operational environment.\no End-User Profile: [AI summary of users and needs] \u2013 This dictates our usability and interface requirements.\no Key Constraints: [AI summary of physical/financial limits] \u2013 This dictates what we cannot do.\no Environmental Factors: [AI summary of external variables/regulations] \u2013 This dictates our need for durability and compliance.`,
+        summaryTemplate: `Thank you for giving a complete picture of the environment:\n\n\u2022 Real-World Setting & Application: [summary] \u2013 This dictates our operational environment.\n\u2022 End-User Profile: [summary] \u2013 This dictates usability and interface requirements.\n\u2022 Key Constraints: [summary] \u2013 This dictates what we cannot do.\n\u2022 Environmental Factors: [summary] \u2013 This dictates durability and compliance needs.`,
         navIdx: 3,
         nextState: STATE.PHASE4
     },
     {
         key: 'phase4',
-        name: 'Phase 4: Integrate (Combine Contents)',
-        goal: 'Combine synthesized knowledge with contextual constraints into a unified solution.',
+        name: 'Phase 4: Integrate (Combine Components)',
+        goal: 'Show how components from different domains connect into one unified system.',
+        transition: 'We have mapped out our essential components and defined the real-world conditions they must survive in. Now, we are moving to the next phase: integrating these pieces into a unified solution.',
         interactions: [
-            "We have mapped out our essential components and defined the real-world conditions they must survive in. Now, we are moving to the next phase: integrating these pieces into a unified solution. Looking at the key elements we extracted, how can the selected components from our different domains be initially combined?",
-            "Why did you select this interface strategy?",
-            "What are the interfacing strategies required to combine hardware and software components?",
-            "Why did you select these interfaces?"
+            { text: "Looking at the key elements we extracted, how can the selected components from our different domains be initially combined?", hint: "Think about what connects to what. How does the hardware send information to the software? What is the handoff point between the mechanical part and the digital part? Start with a simple input-process-output flow." },
+            { text: "Why did you select this integration approach or interface?", hint: "Ask them to justify the connection method." },
+            { text: "What are the interfacing strategies required to combine the hardware and software components?", hint: "Consider communication protocols (UART, I2C, SPI, WiFi, Bluetooth), APIs, middleware, or data formats. What standard or protocol allows two different components to talk to each other reliably?" },
+            { text: "Why did you select these interfaces?", hint: "Ask them for their rationale on these protocols." }
         ],
-        summaryTemplate: `Thank you for designing those connections. Here is a complete integration summary of our unified solution, demonstrating how our disparate domains come together:\n\no Integrated Workflow: [AI summary of the step-by-step process/flow of the solution] \u2013 This represents the sequence of operations.\no Component Interactions: [AI summary of how domain A interacts with domain B] \u2013 This highlights the systemic relationships and data/energy flow.\no Constraint Adaptations: [AI summary of how the design was modified to survive real-world limits] \u2013 This ensures practical viability.\no Problem Resolution: [AI summary of exactly how this system solves the user's initial problem] \u2013 This confirms our core objective is met.`,
+        summaryTemplate: `Thank you for designing those connections:\n\n\u2022 Integrated Workflow: [step-by-step flow] \u2013 Sequence of operations.\n\u2022 Component Interactions: [domain A \u2194 domain B] \u2013 Systemic relationships and data/energy flow.\n\u2022 Constraint Adaptations: [design modifications] \u2013 Ensures practical viability.\n\u2022 Problem Resolution: [how it solves the original problem] \u2013 Confirms core objective is met.`,
         navIdx: 4,
         nextState: STATE.PHASE5
     },
     {
         key: 'phase5',
         name: 'Phase 5: Harmonize (Balance and Trade-offs)',
-        goal: 'Resolve trade-offs and ensure the solution is feasible and sustainable.',
+        goal: 'Evaluate whether the system balances technical performance with real-world constraints.',
+        transition: 'We have successfully integrated our components into a unified workflow. Now, we are moving to the final phase: evaluating and balancing this system.',
         interactions: [
-            "We have successfully integrated our components into a unified workflow. Now, we are moving to the next phase: evaluating and balancing this system. Looking critically at what we've designed, does the integrated solution appropriately balance ideal technical performance with the strict contextual constraints we defined earlier?",
-            "Why do you find this crucial?",
-            "Does the integrated solution appropriately balance ideal technical performance with the strict contextual constraints we defined earlier?",
-            "Why do you find this crucial?"
+            { text: "Looking critically at what we've designed, does the integrated solution appropriately balance ideal technical performance with the strict contextual constraints we defined earlier?", hint: "Think about whether the ideal version of your design is actually buildable under the constraints you identified \u2014 budget, environment, regulations. Where does perfect performance clash with practical limits? That clash is the trade-off." },
+            { text: "Why do you find this balance crucial?", hint: "Ask them why this specific balance impacts the project's success." },
+            { text: "Are there any other ways the integrated solution needs to balance technical performance with contextual constraints? What additional trade-offs did you notice?", hint: "Consider longevity, sustainability, and ethics \u2014 is the solution safe for all users? Is it repairable? Does it respect the environment? Sometimes a technically superior solution is ruled out for ethical or social reasons." },
+            { text: "Why do you find this particular trade-off crucial to address?", hint: "Ask them for their ethical or long-term reasoning." }
         ],
-        summaryTemplate: `Thank you for making those tough decisions. Here is a complete harmonization summary detailing how our solution responsibly balances competing demands:\n\no Resolved Trade-offs: [AI summary of the key compromises made, e.g., prioritizing durability over lightweight design] \u2013 This clarifies what was sacrificed and what was gained.\no Justifications for Priorities: [AI summary of why specific choices were made based on user needs] \u2013 This defends the integrity and logic of the design.\no Sustainability & Ethics: [AI summary of how the solution remains responsible and feasible long-term] \u2013 This ensures the solution is viable for the future without causing undue harm.\no The Harmonized Solution: [AI summary of the final, balanced, and integrated approach] \u2013 This is our realistic, actionable, and mature blueprint.`,
+        summaryTemplate: `Thank you for making those tough decisions:\n\n\u2022 Resolved Trade-offs: [key compromises] \u2013 What was sacrificed and what was gained.\n\u2022 Justifications for Priorities: [why choices were made] \u2013 Defends the logic of the design.\n\u2022 Sustainability & Ethics: [long-term viability] \u2013 Ensures responsible, feasible solution.\n\u2022 The Harmonized Solution: [final balanced approach] \u2013 Realistic, actionable, mature blueprint.`,
         navIdx: 5,
         nextState: STATE.CONCLUSION
     }
@@ -225,7 +230,10 @@ const handleStateTransition = async (input) => {
                 totalScore = 0;
                 updateSidebarProgress(1);
                 const p = PHASES[0];
-                appendMessage(`Thank you, ${userName}. We will analyze the **${currentProject}**.\n\n**${p.name}**\n\n*Goal: ${p.goal}*\n\n${p.interactions[0]}`);
+                let msg = `Thank you, ${userName}. We will analyze the **${currentProject}**.\n\n**${p.name}**\n\n*Goal: ${p.goal}*\n\n`;
+                if (p.transition) msg += `${p.transition}\n\n`;
+                msg += `${p.interactions[0].text}`;
+                appendMessage(msg);
             } else {
                 appendMessage('Please provide a more descriptive engineering project to analyze.');
             }
@@ -263,7 +271,10 @@ const handleStateTransition = async (input) => {
             totalScore = 0;
             updateSidebarProgress(1);
             const p0 = PHASES[0];
-            appendMessage(`Understood. We will now apply the ASCIH framework to the **${currentProject}**.\n\n**${p0.name}**\n\n*Goal: ${p0.goal}*\n\n${p0.interactions[0]}`);
+            let msgFollow = `Understood. We will now apply the ASCIH framework to the **${currentProject}**.\n\n**${p0.name}**\n\n*Goal: ${p0.goal}*\n\n`;
+            if (p0.transition) msgFollow += `${p0.transition}\n\n`;
+            msgFollow += `${p0.interactions[0].text}`;
+            appendMessage(msgFollow);
             break;
     }
 };
@@ -273,27 +284,29 @@ const GEMINI_API_KEY = 'AIzaSyBWfWUll9RIJpvznBjgKBrNdP-N__El_xU';
 
 const generateGeminiInteraction = async (phase, subStepIdx, historyCtx, userAnswer) => {
     const isFinalSummary = (subStepIdx === phase.interactions.length - 1);
+    const interaction = phase.interactions[subStepIdx];
     
     let systemInstruction = "";
     if (!isFinalSummary) {
-        systemInstruction = `You are a facilitator for an interactive learning session using the Socratic method. Do NOT introduce yourself as an instructor.
+        systemInstruction = `Role: Facilitator for an interactive learning session using the Socratic method. (Do NOT introduce yourself).
 Project: "${currentProject}"
 Current Phase: ${phase.name}
-We are currently evaluating the user's answer to this interaction question: "${phase.interactions[subStepIdx]}"
+We are currently evaluating the user's answer to this specific question: "${interaction.text}"
 User's Answer: "${userAnswer}"
 Previous Phase Context: ${JSON.stringify(historyCtx)}
 
-Task:
-1. Evaluate the answer. If they asked a question, answer it. If they said they don't know, gently provide the answer.
-2. Acknowledge their response, point out what is correct, clearly indicate any incorrect/irrelevant parts with an explanation, and provide the actual appropriate perspective.
-3. Keep it brief (2-4 sentences max).
-4. IMPORTANT: Give your evaluation/answer only! DO NOT ask the next question. The UI will append the next question automatically.
+Behavioral Rules:
+1. If the user asks a question, provide an appropriate answer.
+2. If the user explicitly says they don't know, YOU MUST explicitly define and provide the exact technical answer they should have given relating to the "${currentProject}". Do NOT ask them to guess, and Do NOT give a hint. State the answer clearly.
+3. Otherwise, give an acknowledgement \u2192 confirm what is correct \u2192 correct any wrong parts with explanation \u2192 provide the actual ideal perspective before moving to the next question.
+4. Keep it brief (2-4 sentences max).
+5. DO NOT ask the next question! The UI will automatically append the next question.
 
 Respond IN PURE JSON with these fields:
-{"evaluation": "<your thoughtful evaluation and acknowledgment>", "score": <0-100 score of their answer>}`;
+{"evaluation": "<your thoughtful evaluation and response>", "status": "<'correct', 'partial', or 'wrong'>", "score": <0-100 score of their answer>}`;
     } else {
         systemInstruction = `You are a facilitator finalizing Phase: ${phase.name} on the project: "${currentProject}".
-The user just answered the final interaction question: "${phase.interactions[subStepIdx]}"
+The user just answered the final interaction question: "${interaction.text}"
 User's final answer: "${userAnswer}"
 Entire Phase Chat Context: ${JSON.stringify(historyCtx)}
 
@@ -309,7 +322,7 @@ Respond IN PURE JSON with these fields:
     }
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -320,7 +333,9 @@ Respond IN PURE JSON with these fields:
         });
         const data = await response.json();
         if (data.candidates && data.candidates[0].content.parts[0].text) {
-            return JSON.parse(data.candidates[0].content.parts[0].text);
+            const rawText = data.candidates[0].content.parts[0].text;
+            const cleanedText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+            return JSON.parse(cleanedText);
         }
     } catch (e) {
         console.error('Gemini error:', e);
@@ -352,7 +367,7 @@ Respond IN PURE JSON with these fields:
 {"conclusion": "<the formatted markdown text containing the definitions and the application to their project>"}
 `;
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -363,7 +378,9 @@ Respond IN PURE JSON with these fields:
         });
         const data = await response.json();
         if (data.candidates && data.candidates[0].content.parts[0].text) {
-            return JSON.parse(data.candidates[0].content.parts[0].text).conclusion;
+            const rawText = data.candidates[0].content.parts[0].text;
+            const cleanedText = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+            return JSON.parse(cleanedText).conclusion;
         }
     } catch (e) {
         console.error('Gemini error:', e);
@@ -386,8 +403,12 @@ const handlePhaseAnswer = async (input) => {
 
     if (currentSubStepIdx < phase.interactions.length - 1) {
         // Output evaluation, then ask next sub-step question
-        const responseText = `${evalData.evaluation}\n\n${phase.interactions[currentSubStepIdx + 1]}`;
-        appendMessage(responseText, false, { status: "correct", hint: "Good job!" }); // Fake "correct" hint logic for UI styling
+        const responseText = `${evalData.evaluation}\n\n${phase.interactions[currentSubStepIdx + 1].text}`;
+        const feedbackObj = { 
+            status: evalData.status || "correct", 
+            hint: evalData.status === 'correct' ? "Good job!" : "Review Feedback" 
+        };
+        appendMessage(responseText, false, feedbackObj);
         currentSubStepIdx++;
     } else {
         // Final interaction for this phase. Output evaluation + Summary
@@ -416,7 +437,10 @@ const advancePhase = async () => {
                        
         updateSidebarProgress(nextPhase.navIdx);
         setTimeout(() => {
-            appendMessage(`**${nextPhase.name}**\n\n*Goal: ${nextPhase.goal}*\n\n${nextPhase.interactions[0]}`);
+            let nextMsg = `**${nextPhase.name}**\n\n*Goal: ${nextPhase.goal}*\n\n`;
+            if (nextPhase.transition) nextMsg += `${nextPhase.transition}\n\n`;
+            nextMsg += `${nextPhase.interactions[0].text}`;
+            appendMessage(nextMsg);
         }, 800);
     } else {
         // Run Conclusion Logic
@@ -445,7 +469,11 @@ const advancePhase = async () => {
 elements.hintBtn.addEventListener('click', () => {
     const isInPhase = currentState >= STATE.PHASE1 && currentState <= STATE.PHASE5;
     if (isInPhase) {
-        processUserInput('I need a hint.');
+        const phase = PHASES[currentPhaseIdx];
+        if (currentSubStepIdx < phase.interactions.length) {
+            const currentHint = phase.interactions[currentSubStepIdx].hint;
+            appendMessage(currentHint, false, { status: 'partial', hint: 'Guidance Provided' });
+        }
     }
 });
 
